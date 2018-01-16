@@ -1,0 +1,22 @@
+{
+    "name": "tarosky/restrict-image",
+    "description": "Restricted media files library for WordPress",
+    "type": "library",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "TAROSKY",
+            "email": "info@tarosky.co.jp"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.5",
+        "hametuha/pattern": "^0.8.1"
+    },
+    "autoload": {
+        "psr-0": {
+            "Tarosky\\RestrictImage": "app"
+        }
+    }
+}
