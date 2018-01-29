@@ -3,6 +3,8 @@ namespace Tarosky;
 
 
 use Hametuha\Pattern\Singleton;
+use Hametuha\WpEnqueueManager;
+use Tarosky\RestrictImage\Api\Medias;
 use Tarosky\RestrictImage\Api\Uploader;
 use Tarosky\RestrictImage\Security;
 
@@ -23,11 +25,32 @@ class RestrictImage extends Singleton {
 	private $settings = [];
 	
 	/**
+	 * Get root directory.
+	 *
+	 * @return string
+	 */
+	protected function dir() {
+		return dirname( dirname( __DIR__ ) );
+	}
+	
+	/**
 	 * Constructor.
 	 */
 	protected function init() {
 		// Initialize.
 		Uploader::get_instance();
+		Medias::get_instance();
+		// Bulk register.
+		add_action( 'init', [ $this, 'register_assets' ], 9999 );
+	}
+	
+	/**
+	 * Register assets.
+	 */
+	public function register_assets() {
+		WpEnqueueManager::register_styles( $this->dir() . '/assets/css', 'taroimg-', self::VERSION );
+		WpEnqueueManager::register_js( $this->dir() . '/assets/js/components', 'taroimg-', self::VERSION );
+		WpEnqueueManager::register_js_var_files( $this->dir() . '/l10n' );
 	}
 	
 	/**
@@ -45,12 +68,13 @@ class RestrictImage extends Singleton {
 	/**
 	 * Get REST endpoint.
 	 *
-	 * @param string $dir Get URL.
+	 * @param string $method Method name.
+	 * @param string $dir    Get URL.
 	 *
 	 * @return string
 	 */
-	public static function rest_end_point( $dir ) {
-		return rest_url( 'restrict-image/v1/uploader/' . $dir );
+	public static function rest_end_point( $method, $dir = '' ) {
+		return rest_url( "restrict-image/v1/{$method}/{$dir}" );
 	}
 	
 	/**
@@ -88,13 +112,12 @@ class RestrictImage extends Singleton {
 	/**
 	 * Register new directory.
 	 *
-	 * @param string $dir_name              Directory name to register.
-	 * @param bool   $is_restricted         If you don't have to protect, pass false.
-	 * @param bool   $show_in_media_library If you want display it on media library, pass true.
+	 * @param string $dir_name Directory name to register.
+	 * @param array  $args     If you don't have to protect, pass false.
 	 *
 	 * @return \WP_Error|bool
 	 */
-	public static function register( $dir_name, $is_restricted = true, $show_in_media_library = false ) {
+	public static function register( $dir_name, $args = [] ) {
 		if ( did_action( 'init' ) ) {
 			return new \WP_Error( 'invalid_register', __( 'Register directories before init hook.', 'taroimg' ) );
 		}
@@ -102,10 +125,50 @@ class RestrictImage extends Singleton {
 			return new \WP_Error( 'invalid_dir_name', __( 'Directory name should be alphanumeric.', 'taroimg' ) );
 		}
 		$instance = self::get_instance();
-		$instance->settings[ $dir_name ] = [
-			'restricted' => (bool) $is_restricted,
-			'in_library' => (bool) $show_in_media_library,
-		];
+		$arg = wp_parse_args( $args, [
+			'restricted' => true,
+			'in_library' => false,
+			'limit' => 1,
+		] );
+		$arg['limit'] = (int) $arg['limit'];
+		$instance->settings[ $dir_name ] = $arg;
 		return true;
+	}
+	
+	/**
+	 * Get setting.
+	 *
+	 * @param string $key
+	 * @param string $name
+	 *
+	 * @return mixed
+	 */
+	public static function get_setting( $key, $name ) {
+		if ( ! self::is_registered( $key ) ) {
+			return null;
+		} else {
+			$setting = self::get_instance()->settings[ $key ];
+			return isset( $setting[ $name ] ) ? $setting[ $name ] : null;
+		}
+	}
+	
+	/**
+	 * Render form
+	 *
+	 * @param string $key Key name.
+	 *
+	 * @return string
+	 */
+	public static function form( $key ) {
+		if ( ! self::is_registered( $key ) ) {
+			return ;
+		}
+		$url   = self::rest_end_point( 'media', $key );
+		$dir = explode( 'app/Tarosky', __DIR__ );
+		$asset_base = str_replace( ABSPATH, home_url( '/' ), $dir[0] );
+		$debug = WP_DEBUG ? '' : '.min';
+		wp_enqueue_script( 'vue-js', "{$asset_base}assets/js/vue{$debug}.js", [], '2.5.13', true );
+		wp_enqueue_script( 'taroimg-container' );
+		wp_enqueue_style( 'taroimg-uploader' );
 	}
 }

@@ -12,7 +12,8 @@
     "minimum-stability": "stable",
     "require": {
         "php": ">=5.5",
-        "hametuha/pattern": "^0.8.1"
+        "hametuha/pattern": "^0.8.1",
+        "hametuha/wp-enqueue-manager": "^1.0"
     },
     "autoload": {
         "psr-0": {

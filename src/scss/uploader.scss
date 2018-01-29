@@ -1,0 +1,134 @@
+$progress-bar-height: 20px !default;
+$progress-bar-bg: #f9f9f9 !default;
+$progress-bar-color: #7bafb3 !default;
+
+$dropzone-bg: #eee !default;
+$dropzone-bg-active: #cad8ee !default;
+$dropzone-border: dashed 5px transparent !default;
+$dropzone-border-active: #a5b0bf !default;
+$dropzone-pad: 40px !default;
+
+$image-label-color: #aaa !default;
+$image-label-font: monospace;
+
+$delete-button-color: #ddd !default;
+$delete-button-hover-color: #222 !default;
+
+.taroimg{
+
+  &-form{
+    position: relative;
+  }
+
+  &-dropzone{
+    transition: background-color .2s linear, border-color .2s linear;
+    position: relative;
+    z-index: 2;
+    background: $dropzone-bg;
+    padding: $dropzone-pad;
+    border: $dropzone-border;
+    &.on{
+      background: $dropzone-bg-active;
+      border-color: $dropzone-border-active;
+    }
+  }
+
+  &-description{
+    text-align: center;
+  }
+
+  &-input{
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+  }
+
+  &-progress{
+    &-bar{
+      position: relative;
+      height: $progress-bar-height;
+      background-color: $progress-bar-bg;
+      transition: opacity .2s linear;
+      opacity: 0;
+      .uploading &{
+        opacity: 1;
+      }
+    }
+    &-inner{
+      position: absolute;
+      transition: width .2s linear;
+      width: 0;
+      top: 0;
+      left: 0;
+      height: $progress-bar-height;
+      background-color: $progress-bar-color;
+    }
+    &-text{
+      position: relative;
+      height: $progress-bar-height;
+      line-height: $progress-bar-height;
+      text-align: center;
+    }
+  }
+
+  &-list{
+
+    &:after{
+      content: "";
+      display: block;
+      height: 0;
+      clear: both;
+    }
+
+
+  }
+
+
+  &-item{
+    position: relative;
+    transition: opacity .3s linear;
+    &.deleting{
+      opacity: .4;
+    }
+
+    &-thumbnail{
+      max-width: 100%;
+      width: auto;
+      height: auto;
+    }
+    &-label{
+      display: block;
+      text-align: center;
+      color: $image-label-color;
+      font-family: $image-label-font;
+      font-size: 0.85em;
+    }
+    &-delete{
+      position: absolute;
+      top: -0.5em;
+      right: -0.5em;
+      display: none;
+      box-sizing: content-box;
+      .taroimg-item:hover &{
+        display: block;
+      }
+      width: 2em;
+      height: 2em;
+      border: 2px solid $delete-button-color;
+      line-height: 2em;
+      vertical-align: top;
+      border-radius: 50%;
+      padding: 0;
+      color: $delete-button-color;
+      background: #fff;
+      cursor: pointer;
+      &:hover{
+        color: $delete-button-hover-color;
+        border-color: $delete-button-hover-color;
+      }
+    }
+  }
+
+}
+

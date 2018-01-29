@@ -7,7 +7,7 @@ use Tarosky\RestrictImage\Pattern\AbstractApi;
 
 class Uploader extends AbstractApi {
 	
-	protected $route = 'uploader/(?P<key>[a-zA-Z0-9\-_]+)/?';
+
 	
 	/**
 	 * Get arguments.
@@ -17,11 +17,7 @@ class Uploader extends AbstractApi {
 	 * @return array
 	 */
 	protected function get_args( $http_method ) {
-		return [
-			'key' => [
-				'required' => true,
-				'validate_callback' => RestrictImage::class . '::is_registered',
-			],
+		return array_merge( parent::get_args( $http_method ), [
 			'id'  => [
 				'default' => 0,
 				'validate_callback' => [ $this, 'is_numeric' ],
@@ -32,7 +28,7 @@ class Uploader extends AbstractApi {
 			'file' => [
 				'default' => null,
 			],
-		];
+		] );
 	}
 	
 	/**
@@ -72,7 +68,7 @@ class Uploader extends AbstractApi {
 		 * @param string $key           This images type.
 		 */
 		do_action( 'taroimg_media_uploaded', $media_id, get_current_user_id(), $prefix );
-		return $this->map( $media_id );
+		return $this->model->map( $media_id );
 	}
 	
 	/**
@@ -83,8 +79,8 @@ class Uploader extends AbstractApi {
 	 * @return array
 	 */
 	protected function get_file_object( \WP_REST_Request $request ) {
-		if ( isset( $_FILES['my_file'] ) ) {
-			return $_FILES['my_file'];
+		if ( isset( $_FILES['file'] ) ) {
+			return $_FILES['file'];
 		} else {
 			// For JS.
 		}
@@ -92,23 +88,5 @@ class Uploader extends AbstractApi {
 	
 	protected function upload_setting( $key ) {
 	
-	}
-	
-	/**
-	 * Permission callback
-	 *
-	 * @param \WP_REST_Request $request Request object.
-	 *
-	 * @return bool|\WP_Error
-	 */
-	public function permission_callback( \WP_REST_Request $request ) {
-		$can = current_user_can( 'read' );
-		/**
-		 * taroimg_upload_permission
-		 *
-		 * @param bool             $can Current user can.
-		 * @param \WP_REST_Request $request Request object.
-		 */
-		return apply_filters( 'taroimg_upload_permission', $can, $request );
 	}
 }
