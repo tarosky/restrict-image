@@ -2,7 +2,7 @@
     "name": "tarosky/restrict-image",
     "description": "Restricted media files library for WordPress",
     "type": "library",
-    "license": "GPL-3.0",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "TAROSKY",
