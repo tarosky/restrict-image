@@ -7,7 +7,9 @@
   "devel" : false,
   "debug"    : true,
   "jquery": true,
+  "esversion": 6,
   "globals": {
+    "Vue": false,
     "angular": false,
     "google": false,
     "WP_API_Settings": false,

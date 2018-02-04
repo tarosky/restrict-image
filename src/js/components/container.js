@@ -21,7 +21,7 @@
     data: function(){
       return {
         deleting: false,
-      }
+      };
     },
     computed: {
       containerStyle: function() {
@@ -77,10 +77,15 @@
     `,
     data: function(){
       return {
-        directory: 'co2',
         images: [],
         limit: 0,
         loading: false,
+      };
+    },
+    props: {
+      directory: {
+        type: String,
+        required: true
       }
     },
     computed: {
@@ -111,7 +116,7 @@
         if(response.responseJSON && response.responseJSON.message){
           message = response.responseJSON.message;
         }
-        self.throwError(message);
+        this.throwError(message);
       },
 
       getImageList: function(callback) {

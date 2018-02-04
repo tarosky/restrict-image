@@ -5,9 +5,12 @@ namespace Tarosky\RestrictImage;
 
 use Hametuha\Pattern\Singleton;
 
+/**
+ * Model file for resticted media.
+ *
+ * @package Tarosky\RestrictImage
+ */
 class Model extends Singleton {
-	
-	
 	
 	/**
 	 * Get attachment object
