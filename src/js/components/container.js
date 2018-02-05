@@ -72,7 +72,7 @@
             <taroimg-item v-for="image in images" :key="image.id" :endpoint="endpoint" :image="image" @delete-image="deleteImage">
             </taroimg-item>
         </div>
-        <taroimg-uploader v-if="uploadable" :directory="directory" @upload-finished="uploadHandler" @upload-error="uploadErrorHandler"></taroimg-uploader>
+        <taroimg-uploader v-if="uploadable" :directory="directory" :post-id="postId" @upload-finished="uploadHandler" @upload-error="uploadErrorHandler"></taroimg-uploader>
     </div>
     `,
     data: function(){
@@ -86,6 +86,11 @@
       directory: {
         type: String,
         required: true
+      },
+      postId: {
+        type: Number,
+        required: false,
+        default: 0
       }
     },
     computed: {

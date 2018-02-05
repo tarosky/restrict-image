@@ -20,6 +20,7 @@
 			:id="formId"
 			@submit.prevent="submitForm" ref="form">
 			<input type="hidden" name="_wpnonce" :value="nonce" />
+			<input type="hidden" name="id" :value="postId" />
 			<div :class="{'taroimg-dropzone': true, on: onDrag}"
 			    @dragover.prevent.stop="dragOver"
 			    @dragenter.prevent.stop="dragEnter"
@@ -59,6 +60,11 @@
       directory: {
         type: String,
         required: true
+      },
+      postId: {
+        type: Number,
+        required: false,
+        default: 0
       }
     },
     computed: {
