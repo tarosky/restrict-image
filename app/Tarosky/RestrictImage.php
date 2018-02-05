@@ -155,12 +155,13 @@ class RestrictImage extends Singleton {
 	/**
 	 * Render form
 	 *
-	 * @param string $key     Key name.
-	 * @param int    $post_id Post ID to attach.
+	 * @param string $key        Key name.
+	 * @param int    $post_id    Post ID to attach.
+	 * @param bool   $uploadalbe Uploadable.
 	 *
 	 * @return string
 	 */
-	public static function form( $key, $post_id = 0 ) {
+	public static function form( $key, $post_id = 0, $uploadalbe = true ) {
 		if ( ! self::is_registered( $key ) ) {
 			return ;
 		}
@@ -173,12 +174,14 @@ class RestrictImage extends Singleton {
 		wp_enqueue_style( 'taroimg-uploader' );
 		$id = 'taro-img-container-' . $key;
 		$post_id = (int) $post_id;
+		$uploadalbe = $uploadalbe ? 'true' : 'false';
 		$js = <<<JS
 			jQuery(document).ready(function(){
     			var app = new Vue( {
       				el: '#{$id}',
       				data: {
-      				  postId: {$post_id}
+      				  postId: {$post_id},
+      				  uploadable: {$uploadalbe}
       				}
     			} );
   			});
@@ -186,7 +189,7 @@ JS;
 		wp_add_inline_script( 'taroimg-container', $js );
 		?>
 		<div id="<?= esc_attr( $id ) ?>">
-			<taroimg-container directory="<?= esc_attr( $key ) ?>" :post-id="postId"></taroimg-container>
+			<taroimg-container directory="<?= esc_attr( $key ) ?>" :post-id="postId" :allow-upload="uploadable"></taroimg-container>
 		</div>
 		<?php
 	}

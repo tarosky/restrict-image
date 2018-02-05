@@ -76,9 +76,18 @@ class Medias extends AbstractApi {
 		 * @param \WP_REST_Request $request
 		 */
 		$post_arr = apply_filters( 'taroimg_get_image_args', $post_arr, $request );
+		$attachments = array_map( [ $this->model, 'map' ], get_posts( $post_arr ) );
+		/**
+		 * taroimg_media_list
+		 *
+		 * @param array            $attachments Array of attahcments.
+		 * @param \WP_REST_Request $request     REST request object.
+		 * @param int              $user_id     User ID.
+		 */
+		$attachments = apply_filters( 'taroimg_media_list', $attachments, $request, get_current_user_id() );
 		return new \WP_REST_Response( [
 			'limit' => RestrictImage::get_setting( $request->get_param( 'key' ), 'limit' ),
-			'media' => array_map( [ $this->model, 'map' ], get_posts( $post_arr ) ),
+			'media' => $attachments,
 		] );
 	}
 	

@@ -13,7 +13,7 @@
   Vue.component( 'taroimg-item', {
     template: `
       <div :class="{'taroimg-item': true, 'deleting': deleting}" :style="containerStyle">
-          <button class="taroimg-item-delete" type="button" @click="deleteImage">&times;</button>
+          <button v-if="!image.protected" class="taroimg-item-delete" type="button" @click="deleteImage">&times;</button>
           <img class="taroimg-item-thumbnail" :src="image.thumbnail" :alt="image.title" v-if="image.thumbnail" />
           <span class="taroimg-item-label">{{image.name}}</span>
       </div>
@@ -42,6 +42,9 @@
     },
     methods: {
       deleteImage: function(){
+        if(this.image.protected){
+          return;
+        }
         let self = this;
         this.deleting = true;
         $.ajax({
@@ -91,11 +94,16 @@
         type: Number,
         required: false,
         default: 0
+      },
+      allowUpload: {
+        type: Boolean,
+        required: false,
+        default: true,
       }
     },
     computed: {
       uploadable: function(){
-        return 0 === this.limit || this.images.length < this.limit;
+        return ( 0 === this.limit || this.images.length < this.limit ) && this.allowUpload;
       },
       endpoint: function(){
         return TaroimgContainer.endpoint + this.directory;

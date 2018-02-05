@@ -52,6 +52,7 @@ class Model extends Singleton {
 		} else {
 			$return['thumbnail'] = '';
 		}
+		
 		return $return;
 	}
 }
