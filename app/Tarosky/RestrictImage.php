@@ -51,6 +51,9 @@ class RestrictImage extends Singleton {
 		WpEnqueueManager::register_styles( $this->dir() . '/assets/css', 'taroimg-', self::VERSION );
 		WpEnqueueManager::register_js( $this->dir() . '/assets/js/components', 'taroimg-', self::VERSION );
 		WpEnqueueManager::register_js_var_files( $this->dir() . '/l10n' );
+		$debug = WP_DEBUG ? '' : '.min';
+		$asset_base = self::asset_dir();
+		wp_register_script( 'vue-js', "{$asset_base}assets/js/vue{$debug}.js", [], '2.5.13', true );
 	}
 	
 	/**
@@ -166,10 +169,7 @@ class RestrictImage extends Singleton {
 			return ;
 		}
 		$url   = self::rest_end_point( 'media', $key );
-		$dir = explode( 'app/Tarosky', __DIR__ );
-		$asset_base = str_replace( ABSPATH, home_url( '/' ), $dir[0] );
-		$debug = WP_DEBUG ? '' : '.min';
-		wp_enqueue_script( 'vue-js', "{$asset_base}assets/js/vue{$debug}.js", [], '2.5.13', true );
+		$asset_base = self::asset_dir();
 		wp_enqueue_script( 'taroimg-container' );
 		wp_enqueue_style( 'taroimg-uploader' );
 		$id = 'taro-img-container-' . $key;
@@ -192,5 +192,15 @@ JS;
 			<taroimg-container directory="<?= esc_attr( $key ) ?>" :post-id="postId" :allow-upload="uploadable"></taroimg-container>
 		</div>
 		<?php
+	}
+	
+	/**
+	 * Get asset directory
+	 *
+	 * @return string
+	 */
+	public static function asset_dir() {
+		$dir = explode( 'app/Tarosky', __DIR__ );
+		return str_replace( ABSPATH, home_url( '/' ), $dir[0] );
 	}
 }
