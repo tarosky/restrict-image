@@ -69,6 +69,10 @@ class Medias extends AbstractApi {
 				],
 			],
 		];
+		$parent = $request->get_param( 'id' );
+		if ( $parent ) {
+			$post_arr['post_parent'] = $parent;
+		}
 		/**
 		 * taroimg_get_image_args
 		 *

@@ -135,9 +135,14 @@
       getImageList: function(callback) {
         let self = this;
         this.loading = true;
+        let url = this.endpoint;
+        if(this.postId){
+          let glue = /\?/.test(url) ? '&' : '?';
+          url = `${url}${glue}id=${this.postId}`;
+        }
         $.ajax({
           method: 'get',
-          url: this.endpoint,
+          url: url,
           beforeSend: function ( xhr ) {
             xhr.setRequestHeader( 'X-WP-Nonce', TaroimgContainer.nonce );
           },
