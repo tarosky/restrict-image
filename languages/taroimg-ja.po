@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=1; plural=0;\n"
+"Project-Id-Version: Restrict Image\n"
+"POT-Creation-Date: 2018-02-19 20:16+0900\n"
+"PO-Revision-Date: 2018-02-19 20:28+0900\n"
+"Language-Team: Takahashi Fumiki <takahashi.fumiki@hametuha.co.jp>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"Last-Translator: Takahashi Fumiki <takahashi.fumiki@hametuha.co.jp>\n"
+"Language: ja\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPath-1: app\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+"X-Poedit-SearchPathExcluded-1: node_modules\n"
+"X-Poedit-SearchPathExcluded-2: src\n"
+"X-Poedit-SearchPathExcluded-3: assets\n"
+"X-Poedit-SearchPathExcluded-4: vendor\n"
+
+#: app/Tarosky/RestrictImage.php:244
+msgid "Register directories before init hook."
+msgstr "initフックよりも前にディレクトリーを登録してください。"
+
+#: app/Tarosky/RestrictImage.php:247
+msgid "Directory name should be alphanumeric."
+msgstr "ディレクトリ名に使えるのは半角英数字だけです。"
+
+#: app/Tarosky/RestrictImage/Api/Medias.php:110
+msgid "Attachment file not found."
+msgstr "添付ファイルが見つかりません。"
+
+#: app/Tarosky/RestrictImage/Api/Medias.php:115
+msgid "You have no permission to delete this file."
+msgstr "このファイルを削除する権限がありません。"
+
+#: app/Tarosky/RestrictImage/Api/Medias.php:122
+msgid "Failed to delete file."
+msgstr "ファイルの削除に失敗しました。"
+
+#: app/Tarosky/RestrictImage/Api/Medias.php:129
+msgid "Attachment file successfully deleted."
+msgstr "ファイルは無事削除されました。"
+
+#: l10n/taroimg-container.php:11
+msgid "Loading..."
+msgstr "読み込み中……"
+
+#: l10n/taroimg-container.php:12
+msgid "Delete"
+msgstr "削除"
+
+#: l10n/taroimg-container.php:13
+msgid "No image found to delete."
+msgstr "削除すべきファイルが見つかりませんでした。"
+
+#: l10n/taroimg-uploader.php:11
+msgid "Drag & drop file here."
+msgstr "ここにファイルをドラッグ＆ドロップしてください。"
+
+#: l10n/taroimg-uploader.php:12
+msgid "Choose File"
+msgstr "ファイルを選択"

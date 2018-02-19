@@ -42,6 +42,11 @@ class RestrictImage extends Singleton {
 		Medias::get_instance();
 		// Bulk register.
 		add_action( 'init', [ $this, 'register_assets' ], 9999 );
+		if ( did_action( 'plugins_loaded' ) ) {
+			$this->register_i18n();
+		} else {
+			add_action( 'plugins_loaded', [ $this, 'register_i18n' ] );
+		}
 		// Filter image URL.
 		add_filter( 'wp_get_attachment_image_src', [ $this, 'filter_thumbnail_url' ], 10, 2 );
 		// Add query var.
@@ -57,6 +62,14 @@ class RestrictImage extends Singleton {
 		} );
 		// Render Image.
 		add_action( 'pre_get_posts', [ $this, 'render_image' ] );
+	}
+	
+	/**
+	 * Add translation
+	 */
+	public function register_i18n() {
+		$mo = sprintf( 'taroimg-%s.mo', get_user_locale() );
+		return load_textdomain( 'taroimg',  self::dir() . '/languages/' . $mo );
 	}
 	
 	/**
