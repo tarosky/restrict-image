@@ -49,6 +49,16 @@ class Uploader extends AbstractApi {
 		add_filter( 'upload_dir', function( $upload_dir ) use ( $prefix ) {
 			return RestrictImage::set_directory( $upload_dir, $prefix );
 		});
+		// If restricted, change URL.
+		if ( RestrictImage::get_setting( $prefix, 'restricted' ) ) {
+			add_filter( 'wp_handle_upload', function( $file_arr, $action ) use ( $prefix ) {
+				if ( 'sideload' === $action ) {
+					$file_arr = RestrictImage::filter_directory( $file_arr, $prefix );
+				}
+				return $file_arr;
+			}, 10, 2 );
+		}
+		
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';

@@ -42,6 +42,21 @@ class RestrictImage extends Singleton {
 		Medias::get_instance();
 		// Bulk register.
 		add_action( 'init', [ $this, 'register_assets' ], 9999 );
+		// Filter image URL.
+		add_filter( 'wp_get_attachment_image_src', [ $this, 'filter_thumbnail_url' ], 10, 2 );
+		// Add query var.
+		add_filter( 'query_vars', function( $vars ) {
+			$vars[] = 'taroimg_prefix';
+			return $vars;
+		} );
+		// Add image URL.
+		add_filter( 'rewrite_rules_array', function( $rules ) {
+			return array_merge( [
+				'private/media/([^/]+)/(.*)' => 'index.php?taroimg_prefix=$matches[1]&pagename=$matches[2]',
+			], $rules );
+		} );
+		// Render Image.
+		add_action( 'pre_get_posts', [ $this, 'render_image' ] );
 	}
 	
 	/**
@@ -55,6 +70,95 @@ class RestrictImage extends Singleton {
 		$asset_base = self::asset_dir();
 		wp_register_script( 'vue-js', "{$asset_base}assets/js/vue{$debug}.js", [], '2.5.13', true );
 	}
+	
+	/**
+	 * Change image URL.
+	 *
+	 * @param array $image
+	 * @param int   $attachment_id
+	 *
+	 * @return mixed
+	 */
+	public function filter_thumbnail_url( $image, $attachment_id ) {
+		if ( self::is_restricted( $attachment_id ) ) {
+			$url_parts = explode( '/wp-content/uploads/', $image[0] );
+			$url_parts[0] = home_url( 'private/media' );
+			$image[0] = implode( '/', $url_parts );
+		}
+		return $image;
+	}
+	
+	/**
+	 * Render image.
+	 *
+	 * @param \WP_Query $wp_query
+	 */
+	public function render_image( &$wp_query ) {
+		if ( ! $wp_query->is_main_query() ) {
+			return;
+		}
+		$prefix = $wp_query->get( 'taroimg_prefix' );
+		if ( ! $prefix || ! self::is_registered( $prefix ) ) {
+			return;
+		}
+		if ( ! is_user_logged_in() ) {
+			$wp_query->set_404();
+			return;
+		}
+		nocache_headers();
+		$path = $wp_query->get( 'pagename' );
+		// Get attachment and check capability.
+		$file = basename( $path );
+		if ( preg_match( '#^(.*)-\d+x\d+(\.[a-z0-9]+)$#u', $file, $matches ) ) {
+			$orig_file = $matches[1] . $matches[2];
+		} else {
+			$orig_file = $file;
+		}
+		$guid = home_url( "private/media/{$prefix}/" . str_replace( $file, $orig_file, $path ) );
+		global $wpdb;
+		$query = <<<SQL
+			SELECT p.* FROM {$wpdb->posts} AS p
+			LEFT JOIN {$wpdb->postmeta} AS pm
+			ON p.ID = pm.post_id AND pm.meta_key = '_taroimg_key'
+			WHERE p.post_type = 'attachment'
+			  AND p.guid = %s
+			  AND pm.meta_value = %s
+			LIMIT 1
+SQL;
+		$attachment = $wpdb->get_row( $wpdb->prepare( $query, $guid, $prefix ) );
+		if ( ! $attachment ) {
+			$wp_query->set_404();
+			return;
+		}
+		// Check capability.
+		if ( ! current_user_can( 'edit_others_posts' ) && get_current_user_id() !=  $attachment->post_author ) {
+			$wp_query->set_404();
+			return;
+		}
+		// Render file.
+		$upload_dir = wp_upload_dir();
+		$real_path = "{$upload_dir['basedir']}/{$prefix}/{$path}";
+		if ( ! file_exists( $real_path ) ) {
+			$wp_query->set_404();
+			return;
+		}
+		header( 'Content-Type: ' . $attachment->post_mime_type );
+		readfile( $real_path );
+		exit;
+	}
+	
+	/**
+	 * Detect if attachment is restricted.
+	 *
+	 * @param int $attchment_id
+	 *
+	 * @return bool
+	 */
+	public static function is_restricted( $attchment_id ) {
+		$key = get_post_meta( $attchment_id, '_taroimg_key', true );
+		return $key && self::get_setting( $key, 'restricted' );
+	}
+	
 	
 	/**
 	 * Check if setting is registered.
@@ -90,6 +194,9 @@ class RestrictImage extends Singleton {
 	 */
 	public static function set_directory( $upload_dir, $prefix ) {
 		$upload_dir['subdir'] = '/' . $prefix . $upload_dir['subdir'];
+		if ( RestrictImage::get_setting( $prefix, 'restricted' ) ) {
+			$upload_dir['baseurl'] = home_url( "/private/media" );
+		}
 		$upload_dir['path']   = $upload_dir['basedir'] . $upload_dir['subdir'];
 		$upload_dir['url']    = $upload_dir['baseurl'] . $upload_dir['subdir'];
 		/**
@@ -99,6 +206,18 @@ class RestrictImage extends Singleton {
 		 * @param string $prefix     Directory prefix.
 		 */
 		return apply_filters( 'taroimg_directory_setting', $upload_dir, $prefix );
+	}
+	
+	/**
+	 * Filter file URL
+	 *
+	 * @param array  $file_array
+	 * @param string $prefix
+	 *
+	 * @return mixed
+	 */
+	public static function filter_directory( $file_array, $prefix ) {
+		return $file_array;
 	}
 	
 	/**

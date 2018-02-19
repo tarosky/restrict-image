@@ -27,10 +27,12 @@ class Model extends Singleton {
 			'post_title' => 'title',
 			'post_published' => 'published',
 			'post_modified'  => 'modified',
-			'guid' => 'url',
+			'post_parent'    => 'parent',
+			'guid'           => 'url',
 			'post_mime_type' => 'mime',
-			'post_status' => 'status',
-			'menu_order' => 'order',
+			'post_status'    => 'status',
+			'menu_order'     => 'order',
+			'post_author'    => 'author'
 		] as $key => $new_key ) {
 			$value = $attachment->{$key};
 			switch ( $key ) {

@@ -73,6 +73,9 @@ class Medias extends AbstractApi {
 		if ( $parent ) {
 			$post_arr['post_parent'] = $parent;
 		}
+		// Check limit
+		$limit = RestrictImage::get_setting( $request->get_param( 'key' ), 'limit' );
+		$post_arr['posts_per_page'] = $limit;
 		/**
 		 * taroimg_get_image_args
 		 *
@@ -90,7 +93,7 @@ class Medias extends AbstractApi {
 		 */
 		$attachments = apply_filters( 'taroimg_media_list', $attachments, $request, get_current_user_id() );
 		return new \WP_REST_Response( [
-			'limit' => RestrictImage::get_setting( $request->get_param( 'key' ), 'limit' ),
+			'limit' => $limit,
 			'media' => $attachments,
 		] );
 	}
