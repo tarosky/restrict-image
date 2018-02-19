@@ -78,7 +78,8 @@ class Uploader extends AbstractApi {
 		 * @param string $key           This images type.
 		 */
 		do_action( 'taroimg_media_uploaded', $media_id, get_current_user_id(), $prefix );
-		return $this->model->map( $media_id );
+		$media =  $this->model->map( $media_id );
+		return current( apply_filters( 'taroimg_media_list', [ $media ], $request, get_current_user_id() ) );
 	}
 	
 	/**

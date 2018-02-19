@@ -32,7 +32,7 @@
 					    {{dropMsg}}
 					    <br />
                     </span>
-					<button class="taroimg-button" type="button" @click="openFile">{{btnLabel}}</button>
+					<label :for="buttonId" class="taroimg-button" type="button" @click="openFile($event)">{{btnLabel}}</label>
 				</p>
 				
 				<div class="taroimg-progress-bar">
@@ -40,7 +40,7 @@
 					<div class="taroimg-progress-text">{{percentile}}</div>
 				</div>
 			</div>
-			<input class="taroimg-input" type="file" name="file" @change="fileChangeHandler" ref="file">
+			<input class="taroimg-input" :id="buttonId" type="file" name="file" @change="fileChangeHandler" ref="file">
     </form>
     </div>
     `,
@@ -73,6 +73,9 @@
       },
       formId: function(){
         return `taroimg-${this.directory}`;
+      },
+      buttonId: function(){
+        return `taroimg-file-input-${this.directory}`;
       },
       percentile: function(){
         if(!this.total){
@@ -129,8 +132,8 @@
       /**
        * Trigger file select.
        */
-      openFile: function(){
-        this.$refs.file.dispatchEvent(new Event('click'));
+      openFile: function(event){
+        //this.$refs.file.dispatchEvent(event);
       },
 
       /**

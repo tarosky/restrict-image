@@ -80,7 +80,7 @@ class RestrictImage extends Singleton {
 	 * @return mixed
 	 */
 	public function filter_thumbnail_url( $image, $attachment_id ) {
-		if ( self::is_restricted( $attachment_id ) ) {
+		if ( self::is_restricted( $attachment_id ) && false !== strpos( $image[0], '/wp-content/uploads/' ) ) {
 			$url_parts = explode( '/wp-content/uploads/', $image[0] );
 			$url_parts[0] = home_url( 'private/media' );
 			$image[0] = implode( '/', $url_parts );
