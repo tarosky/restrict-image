@@ -58,7 +58,6 @@ class Uploader extends AbstractApi {
 				return $file_arr;
 			}, 10, 2 );
 		}
-		
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 		require_once ABSPATH . 'wp-admin/includes/media.php';
 		require_once ABSPATH . 'wp-admin/includes/image.php';
@@ -70,6 +69,11 @@ class Uploader extends AbstractApi {
 		}
 		// Upload success!
 		RestrictImage::update_media_meta( $media_id, $prefix );
+		$allowed = apply_filters( 'taroimg_allowed_type', true, $media_id, $prefix );
+		if ( is_wp_error( $allowed ) ) {
+			wp_delete_attachment( $media_id, true );
+			return $allowed;
+		}
 		/**
 		 * taroimg_media_uploaded
 		 *

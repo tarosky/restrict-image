@@ -124,7 +124,7 @@
         this.images.push(image);
       },
 
-      uploadErrorHandler: function(event, response){
+      uploadErrorHandler: function(response){
         let message = '';
         if(response.responseJSON && response.responseJSON.message){
           message = response.responseJSON.message;

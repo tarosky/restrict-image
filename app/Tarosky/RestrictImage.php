@@ -314,6 +314,12 @@ SQL;
       				data: {
       				  postId: {$post_id},
       				  uploadable: {$uploadalbe}
+      				},
+      				methods: {
+      				  alertHandler: function(message) {
+      				    console.log(message);
+      				    alert(message);
+      				  }
       				}
     			} );
   			});
@@ -321,7 +327,7 @@ JS;
 		wp_add_inline_script( 'taroimg-container', $js );
 		?>
 		<div id="<?= esc_attr( $id ) ?>">
-			<taroimg-container directory="<?= esc_attr( $key ) ?>" :post-id="postId" :allow-upload="uploadable"></taroimg-container>
+			<taroimg-container directory="<?= esc_attr( $key ) ?>" :post-id="postId" :allow-upload="uploadable" @on-error="alertHandler"></taroimg-container>
 		</div>
 		<?php
 	}
