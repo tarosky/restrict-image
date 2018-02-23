@@ -127,6 +127,7 @@ class RestrictImage extends Singleton {
 		} else {
 			$orig_file = $file;
 		}
+		$orig_file = rawurldecode( $orig_file );
 		$guid = home_url( "private/media/{$prefix}/" . str_replace( $file, $orig_file, $path ) );
 		global $wpdb;
 		$query = <<<SQL
@@ -150,6 +151,7 @@ SQL;
 		}
 		// Render file.
 		$upload_dir = wp_upload_dir();
+		$path = rawurldecode( $path );
 		$real_path = "{$upload_dir['basedir']}/{$prefix}/{$path}";
 		if ( ! file_exists( $real_path ) ) {
 			$wp_query->set_404();
