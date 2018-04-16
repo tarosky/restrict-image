@@ -49,6 +49,7 @@ class RestrictImage extends Singleton {
 		}
 		// Filter image URL.
 		add_filter( 'wp_get_attachment_image_src', [ $this, 'filter_thumbnail_url' ], 10, 2 );
+		add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_thumbnail_srcset' ], 10, 5 );
 		// Add query var.
 		add_filter( 'query_vars', function( $vars ) {
 			$vars[] = 'taroimg_prefix';
@@ -99,6 +100,30 @@ class RestrictImage extends Singleton {
 			$image[0] = implode( '/', $url_parts );
 		}
 		return $image;
+	}
+
+	/**
+	 * Filter src set URL.
+	 *
+	 * @param array  $sources       Array of srcset.
+	 * @param array  $size_array    Sizes.
+	 * @param string $image_src     Origina src.
+	 * @param array  $image_meta    Array of metadata.
+	 * @param int    $attachment_id ID.
+	 *
+	 * @return mixed
+	 */
+	public function filter_thumbnail_srcset( $sources, $size_array, $image_src, $image_meta, $attachment_id ) {
+		if ( self::is_restricted( $attachment_id ) ) {
+			$old = home_url( 'wp-content/uploads/' );
+			$new = home_url( 'private/media/' );
+			foreach ( $sources as $size => $values ) {
+				if ( isset( $sources[ $size ]['url'] ) ) {
+					$sources[ $size ]['url'] = str_replace( $old, $new, $sources[ $size ]['url'] );
+				}
+			}
+		}
+		return $sources;
 	}
 	
 	/**
