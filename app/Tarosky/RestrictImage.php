@@ -50,9 +50,16 @@ class RestrictImage extends Singleton {
 		// Filter image URL.
 		add_filter( 'wp_get_attachment_image_src', [ $this, 'filter_thumbnail_url' ], 10, 2 );
 		add_filter( 'wp_calculate_image_srcset', [ $this, 'filter_thumbnail_srcset' ], 10, 5 );
+		// Hide from media uploader.
+		add_filter( 'ajax_query_attachments_args', function( $args ) {
+			$args['taroimg_is_attachment'] = true;
+			return $args;
+		} );
+		add_filter( 'posts_where', [ $this, 'hide_from_query_attachment' ], 10, 2 );
 		// Add query var.
 		add_filter( 'query_vars', function( $vars ) {
 			$vars[] = 'taroimg_prefix';
+			$vars[] = 'taroimg_is_attachment';
 			return $vars;
 		} );
 		// Add image URL.
@@ -124,6 +131,42 @@ class RestrictImage extends Singleton {
 			}
 		}
 		return $sources;
+	}
+
+	/**
+	 * Hide on query attachments.
+	 *
+	 * @param string    $where    Where string.
+	 * @param \WP_Query $wp_query Query object.
+	 *
+	 * @return string
+	 */
+	public function hide_from_query_attachment( $where, $wp_query ) {
+		global $wpdb;
+		if ( ! $wp_query->get( 'taroimg_is_attachment' ) ) {
+			return $where;
+		}
+		$settings = [];
+		foreach ( $this->settings as $key => $setting ) {
+			if ( ! $setting['in_library'] ) {
+				$settings[] = $key;
+			}
+		}
+		if ( ! $settings ) {
+			return $where;
+		}
+		$in = implode( ', ', array_map( function( $key ) use ( $wpdb ) {
+			return $wpdb->prepare( '%s', $key );
+		}, $settings ) );
+		$suq_query = <<<SQL
+			AND {$wpdb->posts}.ID NOT IN (
+				SELECT post_id FROM {$wpdb->postmeta}
+				WHERE  meta_key   = '_taroimg_key'
+				AND    meta_value IN ( {$in} )
+			)
+SQL;
+		$where .= $suq_query;
+		return $where;
 	}
 	
 	/**
@@ -358,7 +401,7 @@ JS;
 		</div>
 		<?php
 	}
-	
+
 	/**
 	 * Get asset directory
 	 *
